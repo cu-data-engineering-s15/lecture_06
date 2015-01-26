@@ -74,7 +74,7 @@
 						<li>cd into that directory</li>
 						<li>Invoke <strong>npm init</strong></li>
 					</ul>
-					<pre data-trim><code>
+					<pre><code data-trim contenteditable>
 $ mkdir express_test
 $ cd express_test
 $ npm init
@@ -153,7 +153,7 @@ $ npm init
 					<ul>
 						<li>Let's install express:</li>
 					</ul>
-					<p><pre data-trim><code>npm install --save express</code></pre></p>
+					<p><pre><code data-trim contenteditable>npm install --save express</code></pre></p>
 					<ul>
 						<li>Take a look at your directory:
 							<ul>
@@ -175,7 +175,7 @@ $ npm init
 							</ul>
 						</li>
 					</ul>
-					<p><pre data-trim><code>
+					<p><pre><code data-trim contenteditable>
 npm install --save body-parser
 npm install --save morgan
 					</code></pre></p>
@@ -186,7 +186,7 @@ npm install --save morgan
 					<ul>
 						<li>Too see what npm installed, try typing:
 					</ul>
-					<p><pre data-trim><code>
+					<p><pre><code data-trim contenteditable>
 npm list
 					</code></pre></p>
 					<ul>
@@ -201,7 +201,7 @@ npm list
 					<ul>
 						<li>Let's start with a simple GET request</li>
 					</ul>
-					<pre data-trim><code>
+					<pre><code data-trim contenteditable>
 var express = require('express');
 var parser  = require('body-parser');
 var logger   = require('morgan');
@@ -235,7 +235,7 @@ app.get('/api/1.0/current_time', function(req, res) {
 						<li>We declared a route but we forgot to start the server!</li>
 						<li>Add at the bottom of test.js:</li>
 					</ul>
-					<pre data-trim><code>
+					<pre><code data-trim contenteditable>
 app.listen(app.get('port'), function() {
   var message = 'Express started on http://localhost:';
   console.log(message + app.get('port'));
@@ -252,7 +252,7 @@ app.listen(app.get('port'), function() {
 					<ul>
 						<li>Server is running!</li>
 					</ul>
-					<pre><code>
+					<pre><code data-trim contenteditable>
 curl http://localhost:3000/api/1.0/current_time
 {"status":true,"time":"2015-01-26T03:25:05.913Z"}
 					</code></pre>
@@ -268,7 +268,115 @@ curl http://localhost:3000/api/1.0/current_time
 							</ul>
 						</li>
 					</ul>
+				</section>
 
+				<section>
+					<h2>Creating a module</h2>
+					<ul>
+						<li>Install <a href="http://momentjs.com">Moment.js</a></li>
+						<li>Create a directory called lib</li>
+						<li>cd into that directory</li>
+						<li>Create a file called time.js</li>
+					</ul>
+					<pre><code data-trim contenteditable>
+npm install moment --save
+mkdir lib
+cd lib
+vi time.js (or however you want to do it!)
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Our Time Module</h2>
+					<p>Edit time.js to look like this</p>
+					<pre><code data-trim contenteditable>
+var moment = require('moment');
+
+var current_time = function() {
+  var current = moment().format('LL; LTS');
+}
+
+exports.current_time = current_time;
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Back in test.js</h2>
+					<p>Import our module at the top</p>
+					<pre><code data-trim contenteditable>
+var time = require('./lib/time');
+					</code></pre>
+					<p>Change the body of our current_time route to:</p>
+					<pre><code data-trim contenteditable>
+res.json({ status: true, time: time.current_time()});
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Try It!</h2>
+					<pre><code>node test.js</code></pre>
+					<ul>
+						<li>Access the endpoint:</li>
+					</ul>
+					<pre><code data-trim contenteditable>
+curl http://localhost:3000/api/1.0/current_time
+{"status":true,"time":"January 25, 2015; 9:09:16 PM"}
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Adding a POST request</h2>
+					<p>Let's add an endpoint that will calculate how far away a given date is from today.</p>
+					<p>In test.js, make the following changes:</p>
+					<pre><code data-trim contenteditable>
+// Add before the line app.use(logger('dev'))
+app.use(parser.json());
+
+// Add before the call to app.listen
+app.post('/api/1.0/from_now', function(req, res) {
+  res.json({ status: true, data: time.from_now(req.body.date)});
+});
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Modify time.js</h2>
+					<p>In time.js, make the following changes:</p>
+					<pre><code data-trim contenteditable>
+// Add this function after the current_time function
+var from_now = function(date) {
+  return moment(date, 'YYYY-MM-DD').fromNow();
+}
+
+// Add at the end of the file
+exports.from_now = from_now;
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>curl and POST request</h2>
+					<p>To use the new endpoint, type:</p>
+					<pre><code data-trim contenteditable>
+# Type all on one line
+curl -X POST --data '{"date":"2012-01-25"}'
+--header "Content-Type: application/json"
+http://localhost:3000/api/1.0/from_now
+
+{"status":true,"data":"3 years ago"}
+					</code></pre>
+				</section>
+
+					<section>
+						<h2>Your Turn!</h2>
+						<ul>
+							<li>Take a look at the <a href="http://momentjs.com/docs/#/">docs for the Moment.js library</a></li>
+							<li>Identify a feature of Moment.js that you would like to expose via your web service.</li>
+							<li>Add the appropriate function to time.js</li>
+							<li>Add the appropriate route to test.js</li>
+							<li>Determine how to invoke curl to test your new endpoint.</li>
+						</ul>
+						<p>GOOD LUCK!</p>
+					</section>
 			</div>
 
 		</div>
