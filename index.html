@@ -67,6 +67,208 @@
 					<p>Let's develop a web service in Express... step by step!</p>
 				</section>
 
+				<section>
+					<h2>Create a directory</h2>
+					<ul>
+						<li>Create a directory called <code>express_test</code> on your computer.</li>
+						<li>cd into that directory</li>
+						<li>Invoke <strong>npm init</strong></li>
+					</ul>
+					<pre data-trim><code>
+$ mkdir express_test
+$ cd express_test
+$ npm init
+					</code></pre>
+
+				</section>
+
+				<section>
+					<h2>Answering the Questions (1)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Answer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Name</td><td>test_service</td>
+              </tr>
+              <tr>
+                <td>Version</td><td>0.0.1</td>
+              </tr>
+              <tr>
+                <td>Description</td><td>My express web service</td>
+              </tr>
+              <tr>
+                <td>Entry Point</td><td>test.js</td>
+              </tr>
+              <tr>
+            </tbody>
+          </table>
+				</section>
+
+				<section>
+					<h2>Answering the Questions (2)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Answer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Test Command</td><td>&lt;leave blank&gt;</td>
+              </tr>
+              <tr>
+                <td>Git Repository</td><td>&lt;leave blank&gt;</td>
+              </tr>
+              <tr>
+                <td>Keywords</td><td>&lt;leave blank&gt;</td>
+              </tr>
+              <tr>
+                <td>Author</td><td>&lt;your name&gt;</td>
+              </tr>
+              <tr>
+                <td>License</td><td>MIT</td>
+              </tr>
+            </tbody>
+          </table>
+				</section>
+
+				<section>
+					<h2><code>package.json</code></h2>
+					<ul>
+						<li>The output of the <code>npm install</code> command is a text file called <code>package.json</code>.</li>
+						<li>package.json is used by npm to keep track of the dependencies of this particular project (i.e. folder)</li>
+						<li>Each individual project has its own dependencies, unless you ask npm to make a particular module available globally.</li>
+						<li>If you download a project that contains a package.json file, you can run the command <code>npm install</code> to ask npm to download any required modules.</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Installing Express</h2>
+					<ul>
+						<li>Let's install express:</li>
+					</ul>
+					<p><pre data-trim><code>npm install --save express</code></pre></p>
+					<ul>
+						<li>Take a look at your directory:
+							<ul>
+								<li>A new folder has been created: node_modules</li>
+								<li>npm updated your package.json file to contain the new dependency</li>
+							</ul>
+						</li>
+						<li>If you had left out the --save flag, express would have been installed but your package.json file would have been left alone.</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Installing Middleware</h2>
+					<ul>
+						<li>Let's also install two middleware packages
+							<ul>
+								<li>body-parser: for automatic parsing of HTTP request messages</li>
+								<li>morgan: for automatic logging of incoming requests</li>
+							</ul>
+						</li>
+					</ul>
+					<p><pre data-trim><code>
+npm install --save body-parser
+npm install --save morgan
+					</code></pre></p>
+				</section>
+
+				<section>
+					<h2>npm list</h2>
+					<ul>
+						<li>Too see what npm installed, try typing:
+					</ul>
+					<p><pre data-trim><code>
+npm list
+					</code></pre></p>
+					<ul>
+						<li>You will see that npm installed the requested packages plus their dependencies.</li>
+						<li>All of the installed modules live in the node_modules directory.</li>
+						<li>If you want to see what modules are globally installed, include the --global flag in the command</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Creating test.json</h2>
+					<ul>
+						<li>Let's start with a simple GET request</li>
+					</ul>
+					<pre data-trim><code>
+var express = require('express');
+var parser  = require('body-parser');
+var logger   = require('morgan');
+
+var app = express();
+
+app.set('port', process.env.PORT || 3000);
+app.set('env', process.env.NODE_ENV || 'development')
+
+app.use(logger('dev'));
+
+app.get('/api/1.0/current_time', function(req, res) {
+  res.json({ status: true, time: new Date()});
+});
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Try It!</h2>
+					<pre><code>node test.js</code></pre>
+					<ul>
+						<li>Nothing happened!</li>
+						<li>Why?</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Node's Execution Model</h2>
+					<ul>
+						<li>Nothing happened because our code doesn't schedule any work yet</li>
+						<li>We declared a route but we forgot to start the server!</li>
+						<li>Add at the bottom of test.js:</li>
+					</ul>
+					<pre data-trim><code>
+app.listen(app.get('port'), function() {
+  var message = 'Express started on http://localhost:';
+  console.log(message + app.get('port'));
+  message = 'Express is executing in the ';
+  console.log(message + app.get('env') + ' environment.');
+});
+					</code></pre>
+
+				</section>
+
+				<section>
+					<h2>Try It (Again)!</h2>
+					<pre><code>node test.js</code></pre>
+					<ul>
+						<li>Server is running!</li>
+					</ul>
+					<pre><code>
+curl http://localhost:3000/api/1.0/current_time
+{"status":true,"time":"2015-01-26T03:25:05.913Z"}
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Boom!</h2>
+					<ul>
+						<li>Just like that, you have a simple web service!</li>
+						<li>That default time stamp was a bit underwhelming. Let's see if we can clean it up.
+							<ul>
+								<li>Rather than add any more code to our route, let's create our own module!</li>
+							</ul>
+						</li>
+					</ul>
+
 			</div>
 
 		</div>
